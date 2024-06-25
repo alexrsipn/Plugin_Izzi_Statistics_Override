@@ -1,13 +1,21 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { AppStore } from './app.store';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { SpinnerComponent } from './components/spinner/spinner.component';
+import { ControlDeskComponent } from './components/control-desk/control-desk.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    SpinnerComponent,
+    ControlDeskComponent,
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'Pgn-Sky-API-base';
+  constructor(protected readonly store: AppStore) {}
 }
