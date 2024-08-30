@@ -1,9 +1,15 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { AppStore } from './app.store';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { ControlDeskComponent } from './components/control-desk/control-desk.component';
+import { SheetComponent } from './components/sheet/sheet.component';
+import { ActivityDurationComponent } from './components/activity-duration/activity-duration.component';
+import { ExtractionPropertiesComponent } from './components/extraction-properties/extraction-properties.component';
+import { ExtractionResourcesComponent } from './components/extraction-resources/extraction-resources.component';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +17,31 @@ import { ControlDeskComponent } from './components/control-desk/control-desk.com
   imports: [
     CommonModule,
     MatButtonModule,
+    MatDividerModule,
+    MatExpansionModule,
     SpinnerComponent,
-    ControlDeskComponent,
+    // ControlDeskComponent,
+    SheetComponent,
+    ActivityDurationComponent,
+    ExtractionPropertiesComponent,
+    ExtractionResourcesComponent,
   ],
   templateUrl: './app.component.html',
+  providers: [SheetComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
-  constructor(protected readonly store: AppStore) {}
+  readonly panelOpenState = signal(false);
+
+  constructor(
+    protected readonly store: AppStore,
+    protected readonly sheet: SheetComponent
+  ) {}
+  updateActivityDuration() {
+    this.store.UpdateActivityDurationStatistics();
+  }
+  cleanData() {
+    this.sheet.data = [];
+    this.store.cleanLayoutData();
+  }
 }

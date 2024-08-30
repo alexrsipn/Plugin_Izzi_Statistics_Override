@@ -6,8 +6,44 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background-color: #fefefe;
+}
+
+th,
+td {
+  background: #fefefe;
+  padding: 8px 16px;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+}
+
 .container {
   height: 100vh;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.primary-section-top {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 40%;
+  padding-top: 1rem;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .flex-evenly {
@@ -35,9 +71,16 @@ body {
 
 .scroll {
   overflow-y: auto;
-  max-height: 30rem;
-  margin-top: 1.25rem;
+  max-height: 12rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
-  overflow-x: auto;
+  border-radius: 5px;
+  overflow-x: hidden;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.py-4 {
+  padding: 1rem 0;
 }

@@ -1,0 +1,38 @@
+<button
+  type="button"
+  color="primary"
+  mat-raised-button
+  (click)="getActivityDuration()"
+>
+  Obtener duraciones
+</button>
+<ng-container *ngIf="vm$ | async as vm">
+  <ng-container *ngIf="vm.activityDuration.length > 0">
+    <div class="scroll py-4 text-center">
+      <table style="width: 45rem">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Id de recurso</th>
+            <th>Sustitución</th>
+            <th>Promedio</th>
+            <th>Conteo</th>
+            <th>Nivel</th>
+            <th>Dev</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of vm.activityDuration">
+            <td>{{ item.akey }}</td>
+            <td>{{ item.resourceId }}</td>
+            <td>{{ item.override }}</td>
+            <td>{{ item.avg }}</td>
+            <td>{{ item.count }}</td>
+            <td>{{ item.level }}</td>
+            <td>{{ item.dev }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+</ng-container>

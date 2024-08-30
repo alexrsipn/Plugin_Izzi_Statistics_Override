@@ -2,23 +2,98 @@
 <app-spinner />
 }
 <main class="container">
-  <section
-    style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 90%;
-    "
-  >
-    <app-control-desk
-      [controlDesks]="vm.controlDesk"
-      (deskChanged)="store.setSelectedDesk($event)"
-    ></app-control-desk>
+  <section>
+    <mat-accordion>
+      <mat-expansion-panel
+        (opened)="panelOpenState.set(true)"
+        (closed)="panelOpenState.set(false)"
+        [expanded]="true"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>Modificación</mat-panel-title>
+          <mat-panel-description
+            >Modificar duraciones de actividad</mat-panel-description
+          >
+        </mat-expansion-panel-header>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+          "
+        >
+          <app-sheet></app-sheet>
+          @if (vm.layoutDataJSON.length > 0) {
+          <!-- <section
+              style="display: flex; justify-content: center; align-items: center"
+              class="py-4"
+            > -->
+          <div class="flex-evenly">
+            <button mat-raised-button color="basic" (click)="cleanData()">
+              Reiniciar
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="updateActivityDuration()"
+            >
+              Ejecutar
+            </button>
+          </div>
+          <!-- </section> -->
+          }
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </section>
-  <footer class="flex-evenly">
-    <!-- <button mat-raised-button color="primary" (click)="store.prueba()">
-      Prueba
-    </button> -->
+  <section>
+    <mat-accordion>
+      <mat-expansion-panel
+        (opened)="panelOpenState.set(true)"
+        (closed)="panelOpenState.set(false)"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>Exportación</mat-panel-title>
+          <mat-panel-description
+            >Exportar recursos o propiedades de OFSC</mat-panel-description
+          >
+        </mat-expansion-panel-header>
+        <div
+          style="
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+          "
+        >
+          <app-extraction-properties></app-extraction-properties>
+          <app-extraction-resources></app-extraction-resources>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </section>
+  <section>
+    <mat-accordion>
+      <mat-expansion-panel
+        (opened)="panelOpenState.set(true)"
+        (closed)="panelOpenState.set(false)"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>Visualización</mat-panel-title>
+          <mat-panel-description
+            >Visualizar duraciones de actividad</mat-panel-description
+          >
+        </mat-expansion-panel-header>
+        <div
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          <app-activity-duration></app-activity-duration>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </section>
+  <!-- <mat-divider></mat-divider> -->
+  <!-- <footer class="flex-evenly">
     <button
       mat-raised-button
       color="basic"
@@ -26,6 +101,6 @@
     >
       Cerrar
     </button>
-  </footer>
+  </footer> -->
 </main>
 }

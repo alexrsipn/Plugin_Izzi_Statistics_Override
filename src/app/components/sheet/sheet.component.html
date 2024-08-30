@@ -1,0 +1,60 @@
+<div class="flex-center">
+  <ng-container *ngIf="data.length > 0; else noData">
+    <div class="scroll text-center">
+      <table mat-table [dataSource]="data" style="width: 45rem">
+        <ng-container matColumnDef="akey">
+          <th mat-header-cell *matHeaderCellDef>akey</th>
+          <td mat-cell *matCellDef="let element">{{ element.akey }}</td>
+        </ng-container>
+        <ng-container matColumnDef="resourceId">
+          <th mat-header-cell *matHeaderCellDef>resourceId</th>
+          <td mat-cell *matCellDef="let element">{{ element.resourceId }}</td>
+        </ng-container>
+        <ng-container matColumnDef="override">
+          <th mat-header-cell *matHeaderCellDef>override</th>
+          <td mat-cell *matCellDef="let element">{{ element.override }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="headers; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: headers"></tr>
+      </table>
+    </div>
+    <div class="py-4">
+      <p>Cantidad de filas en plantilla: {{ data.length }}</p>
+    </div>
+    <!-- <div class="scroll py-4 text-center">
+      <table style="width: 45rem">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Id de recurso</th>
+            <th>Sustitución</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data">
+            <td>{{ item.akey }}</td>
+            <td>{{ item.resourceId }}</td>
+            <td>{{ item.override }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div> -->
+  </ng-container>
+  <ng-template #noData>
+    <button
+      type="button"
+      color="primary"
+      mat-raised-button
+      (click)="fileInput.click()"
+    >
+      Seleccionar archivo...
+    </button>
+    <input
+      hidden
+      type="file"
+      (change)="onFileChange($event)"
+      #fileInput
+      multiple="false"
+    />
+  </ng-template>
+</div>

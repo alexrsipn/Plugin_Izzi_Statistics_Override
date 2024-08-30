@@ -1,8 +1,80 @@
+export interface GetEnumerationValuesOfAPropertyQueryPar {
+  language: string;
+  limit: number;
+  offset: number;
+}
+
+export interface GetEnumerationValuesOfAPropertyResponse {
+  hasMore: boolean;
+  totalResults: number;
+  limit: number;
+  offset: number;
+  items: GetEnumerationValuesOfAPropertyItem[];
+}
+
+export interface GetEnumerationValuesOfAPropertyItem {
+  active: boolean;
+  label: string;
+  translations: GetEnumerationValuesOfAPropertyTranslationItem[];
+}
+
+export interface GetEnumerationValuesOfAPropertyTranslationItem {
+  language: string;
+  languageISO: string;
+  name: string;
+}
+
+export interface GetResourcesQueryParams {
+  canBeTeamHolder: boolean;
+  canParticipateInTeam: boolean;
+  expand: string[];
+  fields: string[];
+  limit: number;
+  offset: number;
+}
+
+export interface GetResourcesResponse {
+  limit: number;
+  offset: number;
+  totalResults: number;
+  items: GetResourcesResponseItem[];
+}
+
+export interface GetResourcesResponseItem {
+  resourceId: string;
+  resourceInternalId: string;
+  organization: string;
+  name: string;
+  parentResourceId: string;
+  parentResourceInternalId: string;
+  inventories?: any;
+  users?: any;
+  workZones?: any;
+  workSkills?: any;
+  workSchedules?: any;
+  links?: any;
+  avatar?: any;
+}
+
+export interface GetActivityDurationResponse {
+  items: GetActivityDurationItem[];
+}
+
+export interface GetActivityDurationItem {
+  akey: string;
+  avg: number;
+  count: number;
+  dev: number;
+  level: number;
+  override: number;
+  resourceId: string;
+}
+
 export interface GetResourcesResponse {
   totalResults: number;
   limit: number;
   offset: number;
-  items: Resource[];
+  // items: Resource[];
 }
 
 export interface GetActivitiesResponse {
@@ -29,6 +101,25 @@ export interface GetResourcesReqQueryParams {
   fields?: string[];
   limit?: number;
   offset?: number;
+}
+
+export interface PatchUpdateActivityDurationStatisticsReqQueryParams {
+  items: UpdateActivityDurationStatisticsItem[];
+}
+
+export interface UpdateActivityDurationStatisticsItem {
+  akey: string;
+  override: number;
+  resourceId: string;
+}
+
+export interface ActivityDurationPatchResponse {
+  results: ActivityDurationPatchResponseItem;
+}
+
+export interface ActivityDurationPatchResponseItem {
+  status: string;
+  updatedRecords: number;
 }
 
 export interface Resource {

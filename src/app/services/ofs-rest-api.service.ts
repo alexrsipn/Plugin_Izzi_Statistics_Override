@@ -2,12 +2,19 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   Activity,
+  ActivityDurationPatchResponse,
+  ActivityDurationPatchResponseItem,
   EnumerationItem,
   GetActivitiesReqQueryParams,
   GetActivitiesResponse,
+  GetActivityDurationResponse,
+  GetEnumerationValuesOfAPropertyQueryPar,
+  GetEnumerationValuesOfAPropertyResponse,
   GetPropertyEnumerationListResponse,
   GetResourcesReqQueryParams,
   GetResourcesResponse,
+  GetResourcesResponseItem,
+  PatchUpdateActivityDurationStatisticsReqQueryParams,
   Resource,
 } from '../types/ofs-rest-api';
 import {
@@ -20,15 +27,17 @@ import {
   map,
   mergeMap,
   of,
+  switchMap,
 } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class OfsRestApiService {
-  credentials: { user: string; pass: string } = {
+  credentials: { user: string; pass: string; instance: string } = {
     user: '',
     pass: '',
+    instance: '',
   };
   baseUrl = '';
 
@@ -39,40 +48,150 @@ export class OfsRestApiService {
     return this;
   }
 
-  setCredentials(credentials: { user: string; pass: string }) {
+  setCredentials(credentials: {
+    user: string;
+    pass: string;
+    instance: string;
+  }) {
     this.credentials = credentials;
     return this;
   }
 
-  getAllDescendants(
-    resourceId: string,
-    queryParams: GetResourcesReqQueryParams
-  ) {
-    const limit = 100; // MAX ALLOWED BY THE API
+  getEnumerationValuesOfAProperty(propertyLabel: string, offset: number) {
+    const endpoint = `${this.baseUrl}/rest/ofscMetadata/v1/properties/${propertyLabel}/enumerationList`;
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        this.credentials.user +
+          '@' +
+          this.credentials.instance +
+          ':' +
+          this.credentials.pass
+      )}`,
+    });
+    const params = new HttpParams({
+      fromObject: {
+        offset: offset,
+      },
+    });
+    return this.http.get<GetEnumerationValuesOfAPropertyResponse>(endpoint, {
+      headers,
+      params,
+    });
+  }
 
-    return this.getDescendants(resourceId, {
-      ...queryParams,
-      limit,
-      offset: 0,
-    }).pipe(
-      mergeMap((response) => {
-        const calls: Observable<GetResourcesResponse>[] = [];
-        for (
-          let offset = response.offset + limit;
-          offset < response.totalResults;
-          offset += limit
-        ) {
-          calls.push(
-            this.getDescendants(resourceId, { ...queryParams, offset, limit })
-          );
+  getAllEnumerationValuesOfAProperty(propertyLabel: string) {
+    let offset = 0;
+    return this.getEnumerationValuesOfAProperty(propertyLabel, offset).pipe(
+      expand((response) => {
+        if (response.hasMore) {
+          offset += response.items.length;
+          return this.getEnumerationValuesOfAProperty(propertyLabel, offset);
+        } else {
+          return EMPTY;
         }
-        return forkJoin([of(response), ...calls]);
       }),
-      map((responses) =>
-        responses.reduce<Resource[]>((acc, elem) => [...acc, ...elem.items], [])
+      concatMap((response) => response.items),
+      toArray()
+    );
+  }
+
+  getResources(): Observable<GetResourcesResponseItem[]> {
+    const endpoint = `${this.baseUrl}/rest/ofscCore/v1/resources`;
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        this.credentials.user +
+          '@' +
+          this.credentials.instance +
+          ':' +
+          this.credentials.pass
+      )}`,
+    });
+    const fields =
+      'resourceId,resourceInternalId,organization,name,parentResourceId,parentResourceInternalId';
+    const limit = 100;
+    const params = new HttpParams({}).set('limit', limit).set('fields', fields);
+    return this.http.get(endpoint, { headers: headers, params: params }).pipe(
+      switchMap((res: any) => {
+        const total = res.totalResults;
+        const calls = [of(res)];
+        let offset = limit;
+        params.set('offset', offset);
+        while (offset < total) {
+          calls.push(
+            this.http.get(endpoint, { headers: headers, params: params })
+          );
+          offset += limit;
+        }
+        return forkJoin(calls);
+      }),
+      map((data: any[]) =>
+        data.reduce((acc, value) => acc.concat(value.items), [])
       )
     );
   }
+
+  getActivityDurationStatistics() {
+    const endpoint = `${this.baseUrl}/rest/ofscStatistics/v1/activityDurationStats`;
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        this.credentials.user +
+          '@' +
+          this.credentials.instance +
+          ':' +
+          this.credentials.pass
+      )}`,
+    });
+    return this.http.get<GetActivityDurationResponse>(endpoint, { headers });
+  }
+
+  patchUpdateActivityDuration(
+    body: PatchUpdateActivityDurationStatisticsReqQueryParams
+  ) {
+    const endpoint = `${this.baseUrl}/rest/ofscStatistics/v1/activityDurationStats`;
+    const headers = new HttpHeaders({
+      Authorization: `Basic ${btoa(
+        this.credentials.user +
+          '@' +
+          this.credentials.instance +
+          ':' +
+          this.credentials.pass
+      )}`,
+      'Content-Type': 'application/json',
+    });
+    return this.http.patch<ActivityDurationPatchResponseItem>(endpoint, body, {
+      headers,
+    });
+  }
+
+  // getAllDescendants(
+  //   resourceId: string,
+  //   queryParams: GetResourcesReqQueryParams
+  // ) {
+  //   const limit = 100; // MAX ALLOWED BY THE API
+
+  //   return this.getDescendants(resourceId, {
+  //     ...queryParams,
+  //     limit,
+  //     offset: 0,
+  //   }).pipe(
+  //     mergeMap((response) => {
+  //       const calls: Observable<GetResourcesResponse>[] = [];
+  //       for (
+  //         let offset = response.offset + limit;
+  //         offset < response.totalResults;
+  //         offset += limit
+  //       ) {
+  //         calls.push(
+  //           this.getDescendants(resourceId, { ...queryParams, offset, limit })
+  //         );
+  //       }
+  //       return forkJoin([of(response), ...calls]);
+  //     }),
+  //     map((responses) =>
+  //       responses.reduce<Resource[]>((acc, elem) => [...acc, ...elem.items], [])
+  //     )
+  //   );
+  // }
 
   getDescendants(resourceId: string, queryParams: GetResourcesReqQueryParams) {
     const endpoint = `${this.baseUrl}/rest/ofscCore/v1/resources/${resourceId}/descendants`;
