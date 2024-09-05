@@ -37,6 +37,7 @@ interface State {
   layoutLength: number;
   activityDuration: GetActivityDurationItem[];
   propertyValues: GetEnumerationValuesOfAPropertyItem[];
+  propertyLabel: string;
   resources: GetResourcesResponseItem[];
 }
 
@@ -55,6 +56,7 @@ const initialState: State = {
   layoutLength: 0,
   activityDuration: [],
   propertyValues: [],
+  propertyLabel: '',
 };
 
 @Injectable({
@@ -111,6 +113,10 @@ export class AppStore extends ComponentStore<State> {
   readonly setActivityDuration = this.updater<GetActivityDurationItem[]>(
     (state, activityDuration) => ({ ...state, activityDuration })
   );
+  readonly setPropertyLabel = this.updater<string>((state, propertyLabel) => ({
+    ...state,
+    propertyLabel,
+  }));
   readonly setPropertyValues = this.updater<
     GetEnumerationValuesOfAPropertyItem[]
   >((state, propertyValues) => ({ ...state, propertyValues }));
@@ -124,11 +130,6 @@ export class AppStore extends ComponentStore<State> {
   readonly setIsLoading = this.updater<boolean>((state, isLoading) => ({
     ...state,
     isLoading,
-  }));
-
-  readonly cleanLayoutData = this.updater((state) => ({
-    ...state,
-    layoutDataJSON: [],
   }));
 
   // Effects
@@ -152,12 +153,14 @@ export class AppStore extends ComponentStore<State> {
   readonly GetPropertiesValues = this.effect(($) =>
     $.pipe(
       tap(() => this.setIsLoading(true)),
-      concatMap(() => this.getEnumerationPropertyValues()),
+      concatMap(() =>
+        this.getEnumerationPropertyValues(this.get().propertyLabel)
+      ),
       tap((res) => this.handlePropertyValuesInformation(res)),
       tap(() =>
         this.exportService.exportAsExcelFile(
-          this.get().propertyValues!,
-          'Propiedades'
+          this.get().propertyValues,
+          this.get().propertyLabel
         )
       ),
       tap(() => this.setIsLoading(false))
@@ -168,8 +171,7 @@ export class AppStore extends ComponentStore<State> {
     $.pipe(
       tap(() => this.setIsLoading(true)),
       concatMap(() => this.getResources()),
-      tap((res) => this.setResources(res)),
-      tap(() => this.handleResourcesData()),
+      tap((res) => this.handleResourcesData(res)),
       tap(() =>
         this.exportService.exportAsExcelFile(this.get().resources, 'Recursos')
       ),
@@ -207,16 +209,23 @@ export class AppStore extends ComponentStore<State> {
     )
   );
 
+  readonly resetLayoutData = this.effect(($) =>
+    $.pipe(
+      tap(() => this.setLayoutData([])),
+      tap(() => this.setLayoutLength(0)),
+      concatMap(() => this.dialog.success('Layout reiniciado'))
+    )
+  );
+
   public sendCloseMessage = this.effect<Partial<Message>>((data$) =>
     data$.pipe(tap(() => this.ofsPluginApi.close()))
   );
 
-  private getEnumerationPropertyValues(): Observable<
-    GetEnumerationValuesOfAPropertyItem[]
-  > {
-    const property = 'XA_JOBTYPE';
+  private getEnumerationPropertyValues(
+    label: string
+  ): Observable<GetEnumerationValuesOfAPropertyItem[]> {
     return this.ofsRestApi
-      .getAllEnumerationValuesOfAProperty(property)
+      .getAllEnumerationValuesOfAProperty(label)
       .pipe(catchError((e) => this.handleError(e)));
   }
 
@@ -248,12 +257,18 @@ export class AppStore extends ComponentStore<State> {
     const validPropertyValues = EnumerationPropertyValues.filter(
       ({ active }) => active
     );
+    validPropertyValues.forEach((item) => {
+      delete item.active;
+      item.name = item.translations?.filter(
+        (translation) => translation.language === 'es'
+      )[0].name;
+      delete item.translations;
+    });
     this.setPropertyValues(validPropertyValues);
   }
 
-  private handleResourcesData() {
-    const { resources } = this.get();
-    resources.forEach((item) => {
+  private handleResourcesData(res: GetResourcesResponseItem[]) {
+    res.forEach((item) => {
       delete item.inventories;
       delete item.users;
       delete item.workZones;
@@ -262,7 +277,7 @@ export class AppStore extends ComponentStore<State> {
       delete item.links;
       delete item.avatar;
     });
-    this.setResources(resources);
+    this.setResources(res);
   }
 
   private handleError(err: Error) {

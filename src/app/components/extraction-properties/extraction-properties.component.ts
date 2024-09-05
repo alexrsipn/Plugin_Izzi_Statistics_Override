@@ -14,7 +14,8 @@ export class ExtractionPropertiesComponent {
 
   constructor(private readonly store: AppStore) {}
 
-  getPropertyValues() {
+  getPropertyValues(label: string) {
+    this.store.setPropertyLabel(label);
     this.store.GetPropertiesValues();
   }
 }

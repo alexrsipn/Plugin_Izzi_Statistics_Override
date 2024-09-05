@@ -20,7 +20,6 @@ import { ExtractionResourcesComponent } from './components/extraction-resources/
     MatDividerModule,
     MatExpansionModule,
     SpinnerComponent,
-    // ControlDeskComponent,
     SheetComponent,
     ActivityDurationComponent,
     ExtractionPropertiesComponent,
@@ -39,9 +38,5 @@ export class AppComponent {
   ) {}
   updateActivityDuration() {
     this.store.UpdateActivityDurationStatistics();
-  }
-  cleanData() {
-    this.sheet.data = [];
-    this.store.cleanLayoutData();
   }
 }

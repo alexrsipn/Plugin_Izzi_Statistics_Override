@@ -21,6 +21,18 @@
     <div class="py-4">
       <p>Cantidad de filas en plantilla: {{ data.length }}</p>
     </div>
+    <div class="flex-evenly">
+      <button mat-raised-button color="basic" (click)="resetLayoutData()">
+        Reiniciar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="updateActivityDuration()"
+      >
+        Ejecutar
+      </button>
+    </div>
     <!-- <div class="scroll py-4 text-center">
       <table style="width: 45rem">
         <thead>

@@ -13,9 +13,10 @@ export interface GetEnumerationValuesOfAPropertyResponse {
 }
 
 export interface GetEnumerationValuesOfAPropertyItem {
-  active: boolean;
+  active?: boolean;
   label: string;
-  translations: GetEnumerationValuesOfAPropertyTranslationItem[];
+  translations?: GetEnumerationValuesOfAPropertyTranslationItem[];
+  name?: string;
 }
 
 export interface GetEnumerationValuesOfAPropertyTranslationItem {
@@ -42,11 +43,8 @@ export interface GetResourcesResponse {
 
 export interface GetResourcesResponseItem {
   resourceId: string;
-  resourceInternalId: string;
-  organization: string;
   name: string;
   parentResourceId: string;
-  parentResourceInternalId: string;
   inventories?: any;
   users?: any;
   workZones?: any;

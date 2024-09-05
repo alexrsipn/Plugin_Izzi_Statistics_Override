@@ -82,9 +82,9 @@ export class OfsRestApiService {
   getAllEnumerationValuesOfAProperty(propertyLabel: string) {
     let offset = 0;
     return this.getEnumerationValuesOfAProperty(propertyLabel, offset).pipe(
-      expand((response) => {
-        if (response.hasMore) {
-          offset += response.items.length;
+      expand(({ hasMore, items }) => {
+        if (hasMore) {
+          offset += items.length;
           return this.getEnumerationValuesOfAProperty(propertyLabel, offset);
         } else {
           return EMPTY;
@@ -106,8 +106,7 @@ export class OfsRestApiService {
           this.credentials.pass
       )}`,
     });
-    const fields =
-      'resourceId,resourceInternalId,organization,name,parentResourceId,parentResourceInternalId';
+    const fields = 'resourceId,name,parentResourceId';
     const limit = 100;
     const params = new HttpParams({}).set('limit', limit).set('fields', fields);
     return this.http.get(endpoint, { headers: headers, params: params }).pipe(

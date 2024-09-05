@@ -23,6 +23,8 @@ export class SheetComponent {
   wopts: XLSX.WritingOptions = { bookType: 'xlsx', type: 'array' };
   fileName: string = 'layout_override.xlsx';
   headers: string[] = [];
+  wb?: XLSX.WorkBook;
+  ws?: XLSX.WorkSheet;
   onFileChange(evt: any) {
     const target: DataTransfer = <DataTransfer>evt.target;
     if (target.files.length !== 1) {
@@ -31,10 +33,10 @@ export class SheetComponent {
     const reader: FileReader = new FileReader();
     reader.onload = (e: any) => {
       const bstr: string = e.target.result;
-      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-      const wsname: string = wb.SheetNames[0];
-      const ws: XLSX.WorkSheet = wb.Sheets[wsname];
-      const dataRaw = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      this.wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname: string = this.wb.SheetNames[0];
+      this.ws = this.wb.Sheets[wsname];
+      const dataRaw = XLSX.utils.sheet_to_json(this.ws, { header: 1 });
       this.data = this.DataToJSON(dataRaw);
       this.store.setLayoutData(this.data);
       this.store.setLayoutLength(this.data.length);
@@ -58,6 +60,27 @@ export class SheetComponent {
   }
 
   CleanData() {
-    console.log('Limpiar data del archivo cargado');
+    if (this.wb) {
+      this.wb.SheetNames.forEach((sheetName) => {
+        delete this.wb!.Sheets[sheetName];
+        this.wb!.SheetNames = [];
+        this.wb = undefined;
+        this.ws = undefined;
+        console.log('Limpiar data del archivo cargado');
+      });
+    }
+  }
+
+  clean() {
+    this.data = [];
+  }
+
+  updateActivityDuration() {
+    this.store.UpdateActivityDurationStatistics();
+  }
+
+  resetLayoutData() {
+    this.data = [];
+    this.store.resetLayoutData();
   }
 }

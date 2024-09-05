@@ -1,8 +1,26 @@
-<button
-  type="button"
-  color="primary"
-  mat-raised-button
-  (click)="getPropertyValues()"
+<div
+  style="
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  "
 >
-  Exportar claves de actividad
-</button>
+  <button
+    type="button"
+    color="primary"
+    mat-raised-button
+    (click)="getPropertyValues('XA_JOBTYPE')"
+  >
+    Exportar claves de Tipo de OS
+  </button>
+  <br />
+  <button
+    type="button"
+    color="primary"
+    mat-raised-button
+    (click)="getPropertyValues('XA_DROPTYPE')"
+  >
+    Exportar claves de Tipo de construcción
+  </button>
+</div>
