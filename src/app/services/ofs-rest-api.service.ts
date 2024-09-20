@@ -2,13 +2,11 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   Activity,
-  ActivityDurationPatchResponse,
   ActivityDurationPatchResponseItem,
   EnumerationItem,
   GetActivitiesReqQueryParams,
   GetActivitiesResponse,
   GetActivityDurationResponse,
-  GetEnumerationValuesOfAPropertyQueryPar,
   GetEnumerationValuesOfAPropertyResponse,
   GetPropertyEnumerationListResponse,
   GetResourcesReqQueryParams,
@@ -25,7 +23,6 @@ import {
   forkJoin,
   toArray,
   map,
-  mergeMap,
   of,
   switchMap,
 } from 'rxjs';
@@ -34,12 +31,12 @@ import {
   providedIn: 'root',
 })
 export class OfsRestApiService {
-  credentials: { user: string; pass: string; instance: string } = {
+  credentials: { user: string; pass: string } = {
     user: '',
     pass: '',
-    instance: '',
   };
   baseUrl = '';
+  parentResource = '';
 
   constructor(private readonly http: HttpClient) {}
 
@@ -48,11 +45,12 @@ export class OfsRestApiService {
     return this;
   }
 
-  setCredentials(credentials: {
-    user: string;
-    pass: string;
-    instance: string;
-  }) {
+  setParentResource(string: string) {
+    this.parentResource = string;
+    return this;
+  }
+
+  setCredentials(credentials: { user: string; pass: string }) {
     this.credentials = credentials;
     return this;
   }
@@ -61,11 +59,7 @@ export class OfsRestApiService {
     const endpoint = `${this.baseUrl}/rest/ofscMetadata/v1/properties/${propertyLabel}/enumerationList`;
     const headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
-        this.credentials.user +
-          '@' +
-          this.credentials.instance +
-          ':' +
-          this.credentials.pass
+        this.credentials.user + ':' + this.credentials.pass
       )}`,
     });
     const params = new HttpParams({
@@ -99,11 +93,7 @@ export class OfsRestApiService {
     const endpoint = `${this.baseUrl}/rest/ofscCore/v1/resources`;
     const headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
-        this.credentials.user +
-          '@' +
-          this.credentials.instance +
-          ':' +
-          this.credentials.pass
+        this.credentials.user + ':' + this.credentials.pass
       )}`,
     });
     const fields = 'resourceId,name,parentResourceId';
@@ -133,14 +123,19 @@ export class OfsRestApiService {
     const endpoint = `${this.baseUrl}/rest/ofscStatistics/v1/activityDurationStats`;
     const headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
-        this.credentials.user +
-          '@' +
-          this.credentials.instance +
-          ':' +
-          this.credentials.pass
+        this.credentials.user + ':' + this.credentials.pass
       )}`,
     });
-    return this.http.get<GetActivityDurationResponse>(endpoint, { headers });
+    const params = new HttpParams({
+      fromObject: {
+        resourceId: this.parentResource,
+        includeChildren: true,
+      },
+    });
+    return this.http.get<GetActivityDurationResponse>(endpoint, {
+      headers,
+      params,
+    });
   }
 
   patchUpdateActivityDuration(
@@ -149,11 +144,7 @@ export class OfsRestApiService {
     const endpoint = `${this.baseUrl}/rest/ofscStatistics/v1/activityDurationStats`;
     const headers = new HttpHeaders({
       Authorization: `Basic ${btoa(
-        this.credentials.user +
-          '@' +
-          this.credentials.instance +
-          ':' +
-          this.credentials.pass
+        this.credentials.user + ':' + this.credentials.pass
       )}`,
       'Content-Type': 'application/json',
     });

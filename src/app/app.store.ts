@@ -4,33 +4,20 @@ import {
   GetActivityDurationItem,
   GetActivityDurationResponse,
   GetEnumerationValuesOfAPropertyItem,
-  GetResourcesResponse,
   GetResourcesResponseItem,
-  Resource,
   UpdateActivityDurationStatisticsItem,
 } from './types/ofs-rest-api';
 import { ComponentStore } from '@ngrx/component-store';
 import { OfsApiPluginService } from './services/ofs-api-plugin.service';
 import { OfsRestApiService } from './services/ofs-rest-api.service';
 import { Message } from './types/plugin-api';
-import {
-  EMPTY,
-  Observable,
-  catchError,
-  concatMap,
-  finalize,
-  forkJoin,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { EMPTY, Observable, catchError, concatMap, tap } from 'rxjs';
 import { ControlDesk } from './types/plugin';
 import { DialogService } from './services/dialog.service';
-import { SheetComponent } from './components/sheet/sheet.component';
 import { ExportService } from './services/export.service';
 
 interface State {
   isLoading: boolean;
-  // resources: Resource[];
   resourceFields: string[];
   controlDesks: ControlDesk[];
   layoutDataJSON: UpdateActivityDurationStatisticsItem[];
@@ -82,16 +69,18 @@ export class AppStore extends ComponentStore<State> {
   );
 
   //View Model
-  public readonly vm$ = this.select(
-    this.isLoading$,
-    this.layoutData$,
-    this.activityDuration$,
-    (isLoading, layoutDataJSON, activityDuration) => ({
-      isLoading,
-      layoutDataJSON,
-      activityDuration,
-    })
-  );
+  // public readonly vm$ = this.select(
+  //   this.isLoading$,
+  //   this.layoutData$,
+  //   this.activityDuration$,
+  //   (isLoading, layoutDataJSON, activityDuration) => ({
+  //     isLoading,
+  //     layoutDataJSON,
+  //     activityDuration,
+  //   })
+  // );
+
+  public readonly vm$ = this.select((state) => state);
 
   // Updaters
   readonly setSelectedDesk = this.updater<ControlDesk | null>(
@@ -123,10 +112,6 @@ export class AppStore extends ComponentStore<State> {
   readonly setResources = this.updater<GetResourcesResponseItem[]>(
     (state, resources) => ({ ...state, resources })
   );
-  // readonly addResources = this.updater<Resource[]>((state, resources) => ({
-  //   ...state,
-  //   resources: [...state.resources, ...resources],
-  // }));
   readonly setIsLoading = this.updater<boolean>((state, isLoading) => ({
     ...state,
     isLoading,
@@ -137,14 +122,21 @@ export class AppStore extends ComponentStore<State> {
     $.pipe(
       tap(() => this.setIsLoading(true)),
       tap(({ securedData }) => {
-        const { url, user, instance, pass } = securedData;
-        if (!url || !user || !instance || !pass)
+        const { urlOFSC, ofscRestClientId, ofscRestSecretId, parentResource } =
+          securedData;
+        if (
+          !urlOFSC ||
+          !ofscRestClientId ||
+          !ofscRestSecretId ||
+          !parentResource
+        )
           throw new Error(
-            'Los campos url, user y pass son requeridos para el correcto funcionamiento del plugin'
+            'Los campos urlOFSC, ofscRestClientId, ofscRestSecretId y parentResource son requeridos para el correcto funcionamiento del plugin'
           );
         this.ofsRestApi
-          .setUrl(url)
-          .setCredentials({ user: user, pass: pass, instance: instance });
+          .setUrl(urlOFSC)
+          .setParentResource(parentResource)
+          .setCredentials({ user: ofscRestClientId, pass: ofscRestSecretId });
       }),
       tap(() => this.setIsLoading(false))
     )
@@ -200,11 +192,6 @@ export class AppStore extends ComponentStore<State> {
       tap(() => this.setIsLoading(true)),
       concatMap(() => this.getActivityDuration()),
       tap(({ items }) => this.setActivityDuration(items)),
-      // concatMap(() =>
-      //   this.dialog.success(
-      //     'Duraciones de actividad obtenidas de forma exitosa'
-      //   )
-      // ),
       tap(() => this.setIsLoading(false))
     )
   );

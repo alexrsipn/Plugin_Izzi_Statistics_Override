@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { SpinnerComponent } from './components/spinner/spinner.component';
-import { ControlDeskComponent } from './components/control-desk/control-desk.component';
 import { SheetComponent } from './components/sheet/sheet.component';
 import { ActivityDurationComponent } from './components/activity-duration/activity-duration.component';
 import { ExtractionPropertiesComponent } from './components/extraction-properties/extraction-properties.component';
