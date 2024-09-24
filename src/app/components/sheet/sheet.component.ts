@@ -38,6 +38,7 @@ export class SheetComponent {
       this.ws = this.wb.Sheets[wsname];
       const dataRaw = XLSX.utils.sheet_to_json(this.ws, { header: 1 });
       this.data = this.DataToJSON(dataRaw);
+      console.log(this.data);
       this.store.setLayoutData(this.data);
       this.store.setLayoutLength(this.data.length);
       this.headers = Object.keys(this.data[0]);

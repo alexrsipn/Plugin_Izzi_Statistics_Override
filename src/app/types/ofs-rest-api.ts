@@ -63,7 +63,7 @@ export interface GetActivityDurationItem {
   avg: number;
   count: number;
   dev: number;
-  level: number;
+  level: string;
   override: number;
   resourceId: string;
 }

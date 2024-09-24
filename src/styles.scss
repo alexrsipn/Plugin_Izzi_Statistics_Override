@@ -46,6 +46,12 @@ thead {
   flex-direction: column;
 }
 
+.flex-end {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
 .flex-evenly {
   display: flex;
   justify-content: space-evenly;

@@ -1,38 +1,84 @@
-<button
-  type="button"
-  color="primary"
-  mat-raised-button
-  (click)="getActivityDuration()"
->
-  Obtener duraciones
-</button>
-<ng-container *ngIf="vm$ | async as vm">
-  <ng-container *ngIf="vm.activityDuration.length > 0">
-    <div class="scroll py-4 text-center">
-      <table style="width: 45rem">
-        <thead>
-          <tr>
-            <th>Clave</th>
-            <th>Id de recurso</th>
-            <th>Sustitución</th>
-            <th>Promedio</th>
-            <th>Conteo</th>
-            <th>Nivel</th>
-            <th>Dev</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of vm.activityDuration">
-            <td>{{ item.akey }}</td>
-            <td>{{ item.resourceId }}</td>
-            <td>{{ item.override }}</td>
-            <td>{{ item.avg }}</td>
-            <td>{{ item.count }}</td>
-            <td>{{ item.level }}</td>
-            <td>{{ item.dev }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+<div class="flex-center">
+  <button
+    type="button"
+    color="primary"
+    mat-raised-button
+    (click)="getActivityDuration()"
+  >
+    Obtener duraciones
+  </button>
+</div>
+<div class="py-4">
+  <ng-container *ngIf="vm$ | async as vm">
+    <ng-container *ngIf="vm.activityDuration.length > 0">
+      <div class="scroll py-4 text-center">
+        <table mat-table [dataSource]="dataSource" matSort>
+          <ng-container matColumnDef="akey">
+            <th mat-header-cell *matHeaderCellDef>Clave</th>
+            <td mat-cell *matCellDef="let element">{{ element.akey }}</td>
+          </ng-container>
+          <ng-container matColumnDef="resourceId">
+            <th mat-header-cell *matHeaderCellDef>Recurso</th>
+            <td mat-cell *matCellDef="let element">{{ element.resourceId }}</td>
+          </ng-container>
+          <ng-container matColumnDef="override">
+            <th mat-header-cell *matHeaderCellDef>Sustitución</th>
+            <td mat-cell *matCellDef="let element">{{ element.override }}</td>
+          </ng-container>
+          <ng-container matColumnDef="avg">
+            <th mat-header-cell *matHeaderCellDef>Promedio</th>
+            <td mat-cell *matCellDef="let element">{{ element.avg }}</td>
+          </ng-container>
+          <ng-container matColumnDef="count">
+            <th mat-header-cell *matHeaderCellDef>Conteo</th>
+            <td mat-cell *matCellDef="let element">{{ element.count }}</td>
+          </ng-container>
+          <ng-container matColumnDef="dev">
+            <th mat-header-cell *matHeaderCellDef>Desviación</th>
+            <td mat-cell *matCellDef="let element">{{ element.dev }}</td>
+          </ng-container>
+          <ng-container matColumnDef="level">
+            <th mat-header-cell *matHeaderCellDef>Nivel</th>
+            <td mat-cell *matCellDef="let element">{{ element.level }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="headers; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: headers"></tr>
+        </table>
+        <!-- <table style="width: 45rem">
+          <thead>
+            <tr>
+              <th>Clave</th>
+              <th>Recurso</th>
+              <th>Sustitución</th>
+              <th>Promedio</th>
+              <th>Conteo</th>
+              <th>Nivel</th>
+              <th>Dev</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of vm.activityDuration">
+              <td>{{ item.akey }}</td>
+              <td>{{ item.resourceId }}</td>
+              <td>{{ item.override }}</td>
+              <td>{{ item.avg }}</td>
+              <td>{{ item.count }}</td>
+              <td>{{ item.level }}</td>
+              <td>{{ item.dev }}</td>
+            </tr>
+          </tbody>
+        </table> -->
+      </div>
+      <div class="flex-end">
+        <button mat-raised-button (click)="showInfo()">
+          Más información
+          <mat-icon
+            aria-hidden="false"
+            aria-label="Info"
+            fontIcon="help"
+          ></mat-icon>
+        </button>
+      </div>
+    </ng-container>
   </ng-container>
-</ng-container>
+</div>
