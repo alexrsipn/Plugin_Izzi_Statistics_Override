@@ -85,7 +85,7 @@ export class ActivityDurationComponent {
       </p>
       <p>
         <strong>Desviación</strong>: Desviación estándar de la duración
-        estimmada en minutos
+        estimmada en minutos.
       </p>
     </mat-nav-list>
   `,
